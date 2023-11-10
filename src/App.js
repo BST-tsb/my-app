@@ -1,24 +1,36 @@
-import logo from './logo.svg';
+import { Route, Routes } from "react-router-dom"
 import './App.css';
-
+import Home from "./pages/home"
+import Login from "./pages/login"
+import Profil from "./pages/profil"
+import { postProfil, logUser } from './store/store'
+import { useDispatch } from 'react-redux'
+import { useEffect } from "react";
 function App() {
+  const dispatch = useDispatch()
+  const request = (token) => {
+    return {Authorization: `Bearer ${token}`}
+   }
+  useEffect(() => {
+    if(window.localStorage.token) {
+      postProfil(request(window.localStorage.token))
+      .then((res) => {
+        console.log(res.data)
+        const user = { ...res.data.body, token: window.localStorage.token}
+        dispatch(logUser(user))
+        //dispatch(logUser(window.localStorage.token))
+      })
+    }
+  }, [])
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="app">
+    <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/profile" element={<Profil />} />
+    </Routes>
     </div>
+    
   );
 }
 
